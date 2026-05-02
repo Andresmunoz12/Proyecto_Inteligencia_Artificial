@@ -10,9 +10,10 @@ import { ProductsModule } from './products/products.module';
       port: 5432,
       username: 'postgres',
       password: '423064', // La que pusiste al instalar
-      database: 'ferreteria_bd', // El nombre exacto que pusiste en pgAdmin
+      database: 'ferreteria_db', // El nombre exacto que pusiste en pgAdmin
       autoLoadEntities: true,
       synchronize: true, // Esto creará las tablas automáticamente mientras desarrollamos
+      logging: true, // <--- AGREGA ESTA LÍNEA
     }),
     ProductsModule,
   ],

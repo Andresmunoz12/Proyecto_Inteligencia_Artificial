@@ -1,18 +1,23 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { ProductsService } from './products.service';
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { CreateProductDto } from './dto/create-product.dto';
+import { Product } from './entities/product.entity';
 
-describe('ProductsService', () => {
-  let service: ProductsService;
+@Injectable()
+export class ProductsService {
+  constructor(
+    @InjectRepository(Product)
+    private readonly productRepository: Repository<Product>,
+  ) {}
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [ProductsService],
-    }).compile();
+  async create(createProductDto: CreateProductDto) {
+    // Crea la instancia y la guarda en la base de datos
+    const newProduct = this.productRepository.create(createProductDto);
+    return await this.productRepository.save(newProduct);
+  }
 
-    service = module.get<ProductsService>(ProductsService);
-  });
-
-  it('should be defined', () => {
-    expect(service).toBeDefined();
-  });
-});
+  async findAll() {
+    return await this.productRepository.find();
+  }
+}
