@@ -1,89 +1,66 @@
-import { useState } from 'react'
-import axios from 'axios'
+import { useState, useEffect } from 'react';
+import Navbar from './components/Navbar';
+import ProductCatalog from './components/ProductCatalog';
+import AIChatWidget from './components/AIChatWidget';
+import AboutUs from './components/AboutUs';
+import Login from './components/Login';
 
 function App() {
-    const [mensaje, setMensaje] = useState('')
-    const [historial, setHistorial] = useState([])
-    const [cargando, setCargando] = useState(false)
+    const [currentView, setCurrentView] = useState('catalog');
+    const [user, setUser] = useState(null);
 
-    const enviarPregunta = async (e) => {
-        e.preventDefault()
-        if (!mensaje.trim()) return
-
-        // Añadimos tu pregunta al chat
-        const nuevaInteraccion = { rol: 'usuario', texto: mensaje }
-        setHistorial([...historial, nuevaInteraccion])
-        const preguntaActual = mensaje
-        setMensaje('')
-        setCargando(true)
-
-        try {
-            // Llamada a tu servidor de NestJS
-            const res = await axios.post('http://localhost:3000/ai/chat', {
-                question: preguntaActual
-            })
-
-            // Añadimos la respuesta de FerreBot
-            setHistorial(prev => [...prev, { rol: 'bot', texto: res.data.answer }])
-        } catch (error) {
-            console.error("Error:", error)
-            setHistorial(prev => [...prev, { rol: 'bot', texto: "Error al conectar con el servidor." }])
-        } finally {
-            setCargando(false)
+    useEffect(() => {
+        const savedUser = localStorage.getItem('user');
+        if (savedUser) {
+            setUser(JSON.parse(savedUser));
         }
-    }
+    }, []);
+
+    const handleLoginSuccess = (userData) => {
+        setUser(userData);
+        setCurrentView('catalog');
+    };
+
+    const renderView = () => {
+        switch (currentView) {
+            case 'catalog':
+                return <ProductCatalog />;
+            case 'about':
+                return <AboutUs />;
+            case 'login':
+                return <Login onLoginSuccess={handleLoginSuccess} />;
+            default:
+                return <ProductCatalog />;
+        }
+    };
 
     return (
-        <div style={{ padding: '20px', fontFamily: 'Arial' }}>
-            <h1>Gramas y Suministros - IA</h1>
+        <div className="app-container">
+            <Navbar onNavigate={setCurrentView} />
 
-            <div style={{
-                height: '400px',
-                border: '1px solid #ddd',
-                overflowY: 'auto',
-                padding: '10px',
-                borderRadius: '8px',
-                backgroundColor: '#f9f9f9'
+            {user && (
+                <div style={{ backgroundColor: 'var(--primary)', padding: '5px 20px', fontSize: '0.8rem', textAlign: 'right' }}>
+                    Conectado como: <strong>{user.username}</strong>
+                </div>
+            )}
+
+            <main style={{ flex: 1 }}>
+                {renderView()}
+            </main>
+
+            <AIChatWidget />
+
+            <footer style={{
+                padding: '2rem',
+                backgroundColor: 'var(--dark)',
+                color: 'var(--bg-light)',
+                textAlign: 'center',
+                marginTop: 'auto'
             }}>
-                {historial.map((item, i) => (
-                    <div key={i} style={{
-                        marginBottom: '10px',
-                        textAlign: item.rol === 'usuario' ? 'right' : 'left'
-                    }}>
-                        <div style={{
-                            display: 'inline-block',
-                            padding: '10px',
-                            borderRadius: '10px',
-                            backgroundColor: item.rol === 'usuario' ? '#007bff' : '#e9ecef',
-                            color: item.rol === 'usuario' ? 'white' : 'black',
-                            maxWidth: '80%'
-                        }}>
-                            <strong>{item.rol === 'usuario' ? 'Tú: ' : 'FerreBot: '}</strong>
-                            {item.texto}
-                        </div>
-                    </div>
-                ))}
-                {cargando && <p>FerreBot está consultando el inventario...</p>}
-            </div>
-
-            <form onSubmit={enviarPregunta} style={{ marginTop: '20px' }}>
-                <input
-                    type="text"
-                    value={mensaje}
-                    onChange={(e) => setMensaje(e.target.value)}
-                    placeholder="Escribe tu duda aquí..."
-                    style={{ width: '80%', padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
-                />
-                <button
-                    type="submit"
-                    disabled={cargando}
-                    style={{ padding: '10px 20px', marginLeft: '10px', cursor: 'pointer' }}
-                >
-                    Enviar
-                </button>
-            </form>
+                <p>&copy; 2026 Ferretería Gramas y Suministros - Impulsado por IA</p>
+            </footer>
         </div>
-    )
+    );
 }
 
-export default App
+export default App;

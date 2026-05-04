@@ -1,13 +1,12 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config'; // <--- 1. Importación necesaria
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProductsModule } from './products/products.module';
 import { AiModule } from './ai/ai.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
-    // 2. Configuración global de variables de entorno (.env)
-    // Debe ir de primero en el array de imports
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -25,6 +24,7 @@ import { AiModule } from './ai/ai.module';
     }),
     ProductsModule,
     AiModule,
+    AuthModule,
   ],
 })
-export class AppModule {}
+export class AppModule { }
