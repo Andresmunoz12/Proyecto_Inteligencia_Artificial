@@ -1,11 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import aiAvatar from '../assets/ai_avatar.png';
 
 const AIChatWidget = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [mensaje, setMensaje] = useState('');
     const [historial, setHistorial] = useState([
-        { rol: 'bot', texto: '¡Hola! Soy FerreBot, tu asistente experto. ¿En qué puedo ayudarte hoy?' }
+        { rol: 'asistente', texto: '¡Hola! Soy FerreBot. ¿En qué puedo ayudarte hoy? Pídeme información sobre productos o tutoriales para tus proyectos.' }
     ]);
     const [cargando, setCargando] = useState(false);
     const scrollRef = useRef(null);
@@ -14,84 +17,103 @@ const AIChatWidget = () => {
         if (scrollRef.current) {
             scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
         }
-    }, [historial, isOpen]);
+    }, [historial, cargando]);
 
     const enviarPregunta = async (e) => {
         e.preventDefault();
         if (!mensaje.trim()) return;
 
-        const nuevaInteraccion = { rol: 'usuario', texto: mensaje };
-        setHistorial(prev => [...prev, nuevaInteraccion]);
-        const preguntaActual = mensaje;
+        const nuevoMensaje = { rol: 'usuario', texto: mensaje };
+        setHistorial(prev => [...prev, nuevoMensaje]);
         setMensaje('');
         setCargando(true);
 
         try {
-            const res = await axios.post('http://localhost:3000/ai/chat', {
-                question: preguntaActual
-            });
-            setHistorial(prev => [...prev, { rol: 'bot', texto: res.data.answer }]);
+            const response = await axios.post('http://localhost:3000/ai/chat', { question: mensaje });
+            setHistorial(prev => [...prev, { rol: 'asistente', texto: response.data.answer }]);
         } catch (error) {
-            console.error("Error:", error);
-            setHistorial(prev => [...prev, { rol: 'bot', texto: "Lo siento, tuve un problema al consultar el inventario." }]);
+            console.error('Error al hablar con la IA:', error);
+            setHistorial(prev => [...prev, { rol: 'asistente', texto: 'Lo siento, tuve un problema al procesar tu solicitud.' }]);
         } finally {
             setCargando(false);
         }
     };
 
     return (
-        <div style={{ position: 'fixed', bottom: '20px', right: '20px', zIndex: 9999 }}>
+        <div style={{ position: 'fixed', bottom: '30px', right: '30px', zIndex: 9999 }}>
             {/* Botón Flotante */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 style={{
-                    width: '60px',
-                    height: '60px',
+                    width: '65px',
+                    height: '65px',
                     borderRadius: '50%',
-                    backgroundColor: 'var(--primary)',
-                    color: 'var(--dark)',
-                    fontSize: '1.5rem',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+                    backgroundColor: '#333',
+                    color: 'var(--primary)',
+                    fontSize: '1.8rem',
+                    boxShadow: 'var(--shadow-lg)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     border: 'none',
                     cursor: 'pointer',
-                    transition: 'var(--transition)'
+                    transition: 'var(--transition)',
+                    overflow: 'hidden'
                 }}
-                onMouseOver={(e) => e.target.style.transform = 'scale(1.1)'}
-                onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
+                onMouseOver={(e) => {
+                    e.currentTarget.style.transform = 'scale(1.1) rotate(5deg)';
+                    e.currentTarget.style.backgroundColor = '#000';
+                }}
+                onMouseOut={(e) => {
+                    e.currentTarget.style.transform = 'scale(1) rotate(0deg)';
+                    e.currentTarget.style.backgroundColor = '#333';
+                }}
             >
-                {isOpen ? '✖' : '🤖'}
+                {isOpen ? '✖' : (
+                    <img
+                        src={aiAvatar}
+                        alt="AI"
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                )}
             </button>
 
             {/* Ventana de Chat */}
             {isOpen && (
                 <div style={{
                     position: 'absolute',
-                    bottom: '80px',
+                    bottom: '85px',
                     right: '0',
-                    width: '350px',
-                    height: '450px',
+                    width: '400px',
+                    height: '550px',
                     backgroundColor: 'var(--bg-white)',
-                    borderRadius: 'var(--radius)',
-                    boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+                    borderRadius: 'var(--radius-md)',
+                    boxShadow: 'var(--shadow-lg)',
                     display: 'flex',
                     flexDirection: 'column',
                     overflow: 'hidden',
-                    border: '1px solid var(--border)'
+                    border: '1px solid var(--border)',
+                    animation: 'fadeIn 0.3s ease'
                 }}>
                     {/* Header */}
                     <div style={{
-                        padding: '15px',
+                        padding: '20px',
                         backgroundColor: 'var(--dark)',
                         color: 'var(--primary)',
-                        fontWeight: 'bold',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '10px'
+                        justifyContent: 'space-between',
+                        borderBottom: '1px solid var(--border-white)'
                     }}>
-                        <span>🤖 FerreBot IA</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <div style={{ width: '40px', height: '40px', backgroundColor: 'var(--primary)', borderRadius: '50%', overflow: 'hidden', border: '2px solid var(--primary)' }}>
+                                <img src={aiAvatar} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            </div>
+                            <div>
+                                <div style={{ fontWeight: '800', fontSize: '1rem' }}>FerreBot IA</div>
+                                <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: '1px' }}>Soporte Experto</div>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Historial */}
@@ -99,12 +121,12 @@ const AIChatWidget = () => {
                         ref={scrollRef}
                         style={{
                             flex: 1,
-                            padding: '15px',
+                            padding: '20px',
                             overflowY: 'auto',
-                            backgroundColor: '#f9f9f9',
+                            backgroundColor: '#fdfdfd',
                             display: 'flex',
                             flexDirection: 'column',
-                            gap: '10px'
+                            gap: '15px'
                         }}
                     >
                         {historial.map((item, i) => (
@@ -113,42 +135,61 @@ const AIChatWidget = () => {
                                 maxWidth: '85%'
                             }}>
                                 <div style={{
-                                    padding: '10px 14px',
-                                    borderRadius: item.rol === 'usuario' ? '15px 15px 0 15px' : '15px 15px 15px 0',
-                                    backgroundColor: item.rol === 'usuario' ? 'var(--primary)' : 'var(--border)',
+                                    padding: '12px 18px',
+                                    borderRadius: item.rol === 'usuario' ? '20px 20px 0 20px' : '0 20px 20px 20px',
+                                    backgroundColor: item.rol === 'usuario' ? 'var(--primary)' : 'var(--bg-light)',
                                     color: 'var(--dark)',
                                     fontSize: '0.9rem',
-                                    boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+                                    boxShadow: 'var(--shadow-sm)',
+                                    border: item.rol === 'usuario' ? 'none' : '1px solid var(--border)',
+                                    lineHeight: '1.5'
                                 }}>
-                                    {item.texto}
+                                    <ReactMarkdown
+                                        remarkPlugins={[remarkGfm]}
+                                        components={{
+                                            table: ({ node, ...props }) => (
+                                                <div style={{ overflowX: 'auto', margin: '10px 0' }}>
+                                                    <table style={{ borderCollapse: 'collapse', width: '100%', fontSize: '0.8rem' }} {...props} />
+                                                </div>
+                                            ),
+                                            th: ({ node, ...props }) => <th style={{ border: '1px solid #ddd', padding: '6px', backgroundColor: '#f2f2f2', fontWeight: '700' }} {...props} />,
+                                            td: ({ node, ...props }) => <td style={{ border: '1px solid #ddd', padding: '6px' }} {...props} />,
+                                            p: ({ node, ...props }) => <p style={{ margin: '0 0 8px 0' }} {...props} />
+                                        }}
+                                    >
+                                        {item.texto}
+                                    </ReactMarkdown>
                                 </div>
                             </div>
                         ))}
                         {cargando && (
-                            <div style={{ alignSelf: 'flex-start', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-                                FerreBot está pensando...
+                            <div style={{ alignSelf: 'flex-start', display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                <div className="typing-dot" style={{ width: '8px', height: '8px', backgroundColor: 'var(--primary)', borderRadius: '50%', opacity: 0.6 }}></div>
+                                <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: '600' }}>FerreBot está escribiendo...</span>
                             </div>
                         )}
                     </div>
 
                     {/* Input Area */}
                     <form onSubmit={enviarPregunta} style={{
-                        padding: '15px',
+                        padding: '20px',
+                        backgroundColor: 'white',
                         borderTop: '1px solid var(--border)',
                         display: 'flex',
-                        gap: '8px'
+                        gap: '12px'
                     }}>
                         <input
                             type="text"
                             value={mensaje}
                             onChange={(e) => setMensaje(e.target.value)}
-                            placeholder="Pregúntame algo..."
+                            placeholder="¿En qué puedo ayudarte hoy?"
                             style={{
                                 flex: 1,
                                 border: '1px solid var(--border)',
-                                borderRadius: '20px',
-                                padding: '8px 15px',
-                                fontSize: '0.9rem'
+                                borderRadius: 'var(--radius-lg)',
+                                padding: '12px 20px',
+                                fontSize: '0.9rem',
+                                backgroundColor: '#f8f9fa'
                             }}
                         />
                         <button
@@ -157,13 +198,17 @@ const AIChatWidget = () => {
                             style={{
                                 backgroundColor: 'var(--dark)',
                                 color: 'var(--primary)',
-                                width: '35px',
-                                height: '35px',
+                                width: '45px',
+                                height: '45px',
                                 borderRadius: '50%',
                                 display: 'flex',
                                 alignItems: 'center',
-                                justifyContent: 'center'
+                                justifyContent: 'center',
+                                fontSize: '1.2rem',
+                                boxShadow: 'var(--shadow-md)'
                             }}
+                            onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#000'}
+                            onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'var(--dark)'}
                         >
                             ➤
                         </button>

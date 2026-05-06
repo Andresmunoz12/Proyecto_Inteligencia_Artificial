@@ -21,16 +21,84 @@ function App() {
         setCurrentView('catalog');
     };
 
+    const renderHero = () => (
+        <section style={{
+            height: '80vh',
+            width: '100%',
+            position: 'relative',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundImage: `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('/src/assets/hero_bg.png')`, // Suponiendo que la imagen se movió aquí
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            color: 'white',
+            textAlign: 'center',
+            padding: '0 20px'
+        }}>
+            <div className="fade-in" style={{ maxWidth: '800px' }}>
+                <h1 style={{ color: 'var(--primary)', fontSize: '3.5rem', marginBottom: '1rem', textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>
+                    Ferretería Gramas y Suministros
+                </h1>
+                <p style={{ fontSize: '1.25rem', marginBottom: '2rem', fontWeight: '300', opacity: 0.9 }}>
+                    Tu aliado experto en construcción y herramientas con la potencia de la Inteligencia Artificial.
+                </p>
+                <div style={{ display: 'flex', gap: '15px', justifyContent: 'center' }}>
+                    <button
+                        onClick={() => setCurrentView('catalog')}
+                        style={{
+                            padding: '12px 32px',
+                            backgroundColor: 'var(--primary)',
+                            color: 'var(--dark)',
+                            borderRadius: 'var(--radius-lg)',
+                            fontWeight: '700',
+                            fontSize: '1rem',
+                            boxShadow: 'var(--shadow-md)'
+                        }}
+                    >
+                        Ver Catálogo
+                    </button>
+                    <button
+                        onClick={() => setCurrentView('about')}
+                        style={{
+                            padding: '12px 32px',
+                            backgroundColor: 'transparent',
+                            color: 'white',
+                            border: '2px solid white',
+                            borderRadius: 'var(--radius-lg)',
+                            fontWeight: '600',
+                            fontSize: '1rem'
+                        }}
+                    >
+                        Conócenos
+                    </button>
+                </div>
+            </div>
+        </section>
+    );
+
     const renderView = () => {
         switch (currentView) {
             case 'catalog':
-                return <ProductCatalog />;
+                return (
+                    <>
+                        {renderHero()}
+                        <div id="catalog-section" style={{ padding: '80px 0' }}>
+                            <ProductCatalog />
+                        </div>
+                    </>
+                );
             case 'about':
                 return <AboutUs />;
             case 'login':
                 return <Login onLoginSuccess={handleLoginSuccess} />;
             default:
-                return <ProductCatalog />;
+                return (
+                    <>
+                        {renderHero()}
+                        <ProductCatalog />
+                    </>
+                );
         }
     };
 
@@ -39,8 +107,19 @@ function App() {
             <Navbar onNavigate={setCurrentView} />
 
             {user && (
-                <div style={{ backgroundColor: 'var(--primary)', padding: '5px 20px', fontSize: '0.8rem', textAlign: 'right' }}>
-                    Conectado como: <strong>{user.username}</strong>
+                <div style={{
+                    position: 'fixed',
+                    top: '80px',
+                    right: '20px',
+                    zIndex: 900,
+                    backgroundColor: 'var(--primary)',
+                    padding: '8px 16px',
+                    fontSize: '0.85rem',
+                    borderRadius: 'var(--radius-sm)',
+                    boxShadow: 'var(--shadow-sm)',
+                    fontWeight: '600'
+                }}>
+                    👋 {user.username}
                 </div>
             )}
 
@@ -51,13 +130,17 @@ function App() {
             <AIChatWidget />
 
             <footer style={{
-                padding: '2rem',
+                padding: '4rem 0',
                 backgroundColor: 'var(--dark)',
-                color: 'var(--bg-light)',
+                color: 'rgba(255,255,255,0.7)',
                 textAlign: 'center',
-                marginTop: 'auto'
+                borderTop: '1px solid var(--border-white)'
             }}>
-                <p>&copy; 2026 Ferretería Gramas y Suministros - Impulsado por IA</p>
+                <div className="container">
+                    <h3 style={{ color: 'var(--primary)', marginBottom: '1rem' }}>GRAMAS Y SUMINISTROS</h3>
+                    <p style={{ marginBottom: '2rem', fontSize: '0.9rem' }}>Construyendo el futuro con calidad y tecnología.</p>
+                    <p style={{ fontSize: '0.8rem' }}>&copy; 2026 Todos los derechos reservados.</p>
+                </div>
             </footer>
         </div>
     );
