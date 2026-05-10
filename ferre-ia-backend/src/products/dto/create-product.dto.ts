@@ -4,4 +4,5 @@ export class CreateProductDto {
   price: number;
   stock: number;
   ai_description?: string; // El signo ? indica que es opcional
+  image_url?: string;
 }

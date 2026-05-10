@@ -4,6 +4,7 @@ import ProductCatalog from './components/ProductCatalog';
 import AIChatWidget from './components/AIChatWidget';
 import AboutUs from './components/AboutUs';
 import Login from './components/Login';
+import InventoryVision from './components/InventoryVision';
 
 function App() {
     const [currentView, setCurrentView] = useState('catalog');
@@ -38,10 +39,10 @@ function App() {
         }}>
             <div className="fade-in" style={{ maxWidth: '800px' }}>
                 <h1 style={{ color: 'var(--primary)', fontSize: '3.5rem', marginBottom: '1rem', textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>
-                    Ferretería Gramas y Suministros
+                    FerreNext
                 </h1>
                 <p style={{ fontSize: '1.25rem', marginBottom: '2rem', fontWeight: '300', opacity: 0.9 }}>
-                    Tu aliado experto en construcción y herramientas con la potencia de la Inteligencia Artificial.
+                    El futuro de las ferreterías.
                 </p>
                 <div style={{ display: 'flex', gap: '15px', justifyContent: 'center' }}>
                     <button
@@ -89,7 +90,9 @@ function App() {
                     </>
                 );
             case 'about':
-                return <AboutUs />;
+                return <AboutUs onNavigate={setCurrentView} />;
+            case 'inventory':
+                return <InventoryVision onProductSaved={() => setCurrentView('catalog')} />;
             case 'login':
                 return <Login onLoginSuccess={handleLoginSuccess} />;
             default:
@@ -104,7 +107,7 @@ function App() {
 
     return (
         <div className="app-container">
-            <Navbar onNavigate={setCurrentView} />
+            <Navbar onNavigate={setCurrentView} currentView={currentView} />
 
             {user && (
                 <div style={{
@@ -137,7 +140,7 @@ function App() {
                 borderTop: '1px solid var(--border-white)'
             }}>
                 <div className="container">
-                    <h3 style={{ color: 'var(--primary)', marginBottom: '1rem' }}>GRAMAS Y SUMINISTROS</h3>
+                    <h3 style={{ color: 'var(--primary)', marginBottom: '1rem' }}>FERRENEXT</h3>
                     <p style={{ marginBottom: '2rem', fontSize: '0.9rem' }}>Construyendo el futuro con calidad y tecnología.</p>
                     <p style={{ fontSize: '0.8rem' }}>&copy; 2026 Todos los derechos reservados.</p>
                 </div>

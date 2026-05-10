@@ -14,4 +14,14 @@ export class AiController {
       answer: await this.aiService.generateResponse(question.trim()),
     };
   }
+
+  @Post('vision/analyze')
+  async analyze(@Body('image') image: string) {
+    if (!image) {
+      throw new BadRequestException('Se requiere una imagen en formato base64.');
+    }
+    // Si el base64 trae el prefijo "data:image/jpeg;base64,", lo removemos
+    const base64Data = image.includes(',') ? image.split(',')[1] : image;
+    return await this.aiService.analyzeImage(base64Data);
+  }
 }

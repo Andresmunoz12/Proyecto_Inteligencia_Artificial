@@ -35,12 +35,22 @@ const ProductCard = ({ product }) => {
             <div style={{
                 height: '220px',
                 overflow: 'hidden',
-                borderBottom: '1px solid var(--border)'
+                borderBottom: '1px solid var(--border)',
+                backgroundColor: '#ffffff', // Fondo blanco para que luzcan mejor los productos
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '15px' // Espacio para que no toquen los bordes
             }}>
                 <img
-                    src={getProductImage(product.name)}
+                    src={product.image_url || getProductImage(product.name)}
                     alt={product.name}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    style={{
+                        maxWidth: '100%',
+                        maxHeight: '100%',
+                        objectFit: 'contain',
+                        transition: 'var(--transition)'
+                    }}
                 />
             </div>
 

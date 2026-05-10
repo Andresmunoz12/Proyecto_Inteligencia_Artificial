@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const Navbar = ({ onNavigate }) => {
+const Navbar = ({ onNavigate, currentView }) => {
     const [isScrolled, setIsScrolled] = useState(false);
 
     useEffect(() => {
@@ -18,9 +18,9 @@ const Navbar = ({ onNavigate }) => {
         right: 0,
         zIndex: 1000,
         padding: isScrolled ? '12px 0' : '20px 0',
-        backgroundColor: isScrolled ? 'var(--glass-dark)' : 'transparent',
-        backdropFilter: isScrolled ? 'blur(12px)' : 'none',
-        borderBottom: isScrolled ? '1px solid var(--border-white)' : 'none',
+        backgroundColor: (isScrolled || currentView === 'login') ? 'var(--glass-dark)' : 'transparent',
+        backdropFilter: (isScrolled || currentView === 'login') ? 'blur(12px)' : 'none',
+        borderBottom: (isScrolled || currentView === 'login') ? '1px solid var(--border-white)' : 'none',
         transition: 'var(--transition)',
         color: isScrolled ? 'var(--text-white)' : 'var(--dark)'
     };
@@ -31,7 +31,8 @@ const Navbar = ({ onNavigate }) => {
         fontWeight: '600',
         cursor: 'pointer',
         position: 'relative',
-        color: 'white', // Siempre blanco para visibilidad sobre hero y glass dark
+        color: 'white',
+        textShadow: isScrolled ? 'none' : '0 1px 4px rgba(0,0,0,0.3)',
         transition: 'var(--transition)',
     });
 
@@ -47,16 +48,18 @@ const Navbar = ({ onNavigate }) => {
                         display: 'flex',
                         alignItems: 'center',
                         gap: '8px',
-                        color: 'white'
+                        color: 'white',
+                        textShadow: isScrolled ? 'none' : '0 1px 4px rgba(0,0,0,0.3)',
                     }}
                 >
-                    <span style={{ backgroundColor: 'var(--primary)', color: 'var(--dark)', padding: '4px 8px', borderRadius: '4px' }}>G</span>
-                    <span style={{ letterSpacing: '-1px' }}>GRAMAS</span>
+                    <span style={{ backgroundColor: 'var(--primary)', color: 'var(--dark)', padding: '4px 8px', borderRadius: '4px' }}>F</span>
+                    <span style={{ letterSpacing: '-1px' }}>FERRENEXT</span>
                 </div>
 
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                     <div onClick={() => onNavigate('catalog')} style={linkStyles()}>Productos</div>
                     <div onClick={() => onNavigate('about')} style={linkStyles()}>Nosotros</div>
+                    <div onClick={() => onNavigate('inventory')} style={linkStyles()}>Inventario</div>
                     <button
                         onClick={() => onNavigate('login')}
                         style={{

@@ -154,7 +154,8 @@ const AIChatWidget = () => {
                                             ),
                                             th: ({ node, ...props }) => <th style={{ border: '1px solid #ddd', padding: '6px', backgroundColor: '#f2f2f2', fontWeight: '700' }} {...props} />,
                                             td: ({ node, ...props }) => <td style={{ border: '1px solid #ddd', padding: '6px' }} {...props} />,
-                                            p: ({ node, ...props }) => <p style={{ margin: '0 0 8px 0' }} {...props} />
+                                            p: ({ node, ...props }) => <p style={{ margin: '0 0 8px 0' }} {...props} />,
+                                            a: ({ node, ...props }) => <a target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', fontWeight: 'bold' }} {...props} />
                                         }}
                                     >
                                         {item.texto}

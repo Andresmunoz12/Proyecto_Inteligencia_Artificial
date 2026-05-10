@@ -1,8 +1,8 @@
 import React from 'react';
 
-const AboutUs = () => {
+const AboutUs = ({ onNavigate }) => {
     return (
-        <div style={{ backgroundColor: 'var(--bg-light)', minHeight: '100vh', paddingTop: '80px' }}>
+        <div style={{ backgroundColor: 'var(--bg-light)', minHeight: '100vh' }}>
             {/* Hero Section */}
             <div style={{
                 height: '400px',
@@ -19,9 +19,40 @@ const AboutUs = () => {
                 <h1 style={{ color: 'var(--primary)', fontSize: '3.5rem', marginBottom: '1rem', textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>
                     Nuestra Historia
                 </h1>
-                <p style={{ color: 'white', fontSize: '1.25rem', maxWidth: '800px', fontWeight: '300', opacity: 0.9 }}>
+                <p style={{ color: 'white', fontSize: '1.25rem', maxWidth: '800px', fontWeight: '300', opacity: 0.9, marginBottom: '2rem' }}>
                     Más de 20 años construyendo confianza y brindando soluciones de calidad para cada proyecto.
                 </p>
+
+                <div style={{ display: 'flex', gap: '15px', justifyContent: 'center' }}>
+                    <button
+                        onClick={() => onNavigate('catalog')}
+                        style={{
+                            padding: '12px 32px',
+                            backgroundColor: 'transparent',
+                            color: 'white',
+                            border: '2px solid var(--primary)',
+                            borderRadius: 'var(--radius-lg)',
+                            fontWeight: '600',
+                            fontSize: '1rem'
+                        }}
+                    >
+                        Ver Catálogo
+                    </button>
+                    <button
+                        onClick={() => onNavigate('about')}
+                        style={{
+                            padding: '12px 32px',
+                            backgroundColor: 'var(--primary)',
+                            color: 'var(--dark)',
+                            borderRadius: 'var(--radius-lg)',
+                            fontWeight: '700',
+                            fontSize: '1rem',
+                            boxShadow: 'var(--shadow-md)'
+                        }}
+                    >
+                        Conócenos
+                    </button>
+                </div>
             </div>
 
             {/* Content Section */}
@@ -78,7 +109,7 @@ const AboutUs = () => {
                         </div>
                         <div>
                             <p style={{ fontWeight: '700', marginBottom: '0.5rem' }}>✉️ Correo</p>
-                            <p style={{ opacity: 0.8 }}>contacto@gramas-suministros.com</p>
+                            <p style={{ opacity: 0.8 }}>contacto@ferrenext.com</p>
                         </div>
                     </div>
                 </div>

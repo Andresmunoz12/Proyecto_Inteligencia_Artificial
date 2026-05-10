@@ -19,4 +19,7 @@ export class Product {
 
   @Column('text', { nullable: true })
   ai_description: string; // Clave para el asistente inteligente
+
+  @Column('text', { nullable: true })
+  image_url: string;
 }

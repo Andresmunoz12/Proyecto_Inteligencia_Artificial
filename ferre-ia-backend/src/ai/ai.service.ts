@@ -1,6 +1,6 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import Groq from 'groq-sdk';
-import { ProductsService } from '../products/products.service'; // 1. Importa tu servicio de productos
+import { ProductsService } from '../products/products.service';
 
 const SYSTEM_INSTRUCTION = `Eres un asistente virtual inteligente de una ferretería. 
 Tu nombre es FerreBot. Tu objetivo es ayudar a los clientes con información sobre productos de ferretería, 
@@ -13,9 +13,11 @@ NUEVAS CAPACIDADES:
 REGLAS DE FORMATO:
 1. Cuando proporciones detalles de uno o más productos, utiliza SIEMPRE tablas Markdown para organizar la información (Nombre, Marca, Precio, Stock, etc.).
 2. Usa negritas para resaltar nombres de productos o términos importantes.
-3. Usa enlaces de Markdown para los tutoriales de YouTube (ej: [Ver Tutorial en YouTube](https://www.youtube.com/results?search_query=como+cortar+madera)).
+3. Usa enlaces de Markdown y ponlos en negrilla para que se distingan del texto,en los tutoriales de YouTube (ej: [Ver Tutorial en YouTube](https://www.youtube.com/results?search_query=como+cortar+madera)).
 4. Mantén las descripciones técnicas concisas y bien estructuradas.
-5. SOLO recomienda productos que se encuentren en el INVENTARIO REAL que se te proporciona.`;
+5. SOLO recomienda productos que se encuentren en el INVENTARIO REAL que se te proporciona.
+6. Cuando sugieras un video tutorial, asegúrate de proporcionar el enlace de YouTube correctamente formateado. Los enlaces se abrirán automáticamente en una nueva pestaña.`;
+
 
 @Injectable()
 export class AiService implements OnModuleInit {
@@ -31,7 +33,7 @@ export class AiService implements OnModuleInit {
       return;
     }
     this.groq = new Groq({ apiKey });
-    console.log('✅ IA de Groq (llama-3.3-70b-versatile) lista con acceso a inventario');
+    console.log('✅ IA de Groq (Llama-3 y Vision) lista para chat e inventario');
   }
 
   async generateResponse(prompt: string): Promise<string> {
@@ -63,6 +65,59 @@ export class AiService implements OnModuleInit {
     } catch (error: any) {
       console.error('--- ERROR DE IA ---');
       return `Error al conectar con la IA: ${error?.message ?? 'Error desconocido'}`;
+    }
+  }
+
+  async analyzeImage(imageBuffer: string): Promise<any> {
+    try {
+      if (!this.groq) {
+        throw new Error('Groq AI no está inicializada.');
+      }
+
+      const prompt = `Analiza esta imagen de un producto de ferretería. 
+      Indica con precisión:
+      1. Nombre del producto.
+      2. Marca (si es visible).
+      3. Estado (si se ve nuevo, usado, o dañado).
+      4. Categoría (ej: Herramientas manuales, Eléctricas, Pintura, etc.).
+
+      Responde únicamente en formato JSON puro con la siguiente estructura:
+      {
+        "name": "nombre",
+        "brand": "marca o 'Genérico'",
+        "state": "nuevo/usado/dañado",
+        "category": "categoría",
+        "description": "breve descripción técnica"
+      }`;
+
+      const completion = await this.groq.chat.completions.create({
+        model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+        messages: [
+          {
+            role: 'user',
+            content: [
+              { type: 'text', text: prompt },
+              {
+                type: 'image_url',
+                image_url: {
+                  url: `data:image/jpeg;base64,${imageBuffer}`,
+                },
+              },
+            ],
+          },
+        ],
+        temperature: 0.5,
+        max_tokens: 1024,
+      });
+
+      const text = completion.choices[0]?.message?.content ?? '';
+
+      // Limpiar el texto en caso de que traiga backticks de markdown
+      const jsonStr = text.replace(/```json/g, '').replace(/```/g, '').trim();
+      return JSON.parse(jsonStr);
+    } catch (error: any) {
+      console.error('--- ERROR GROQ VISION AI ---', error);
+      throw new Error(`Error en análisis de imagen con Groq: ${error.message}`);
     }
   }
 }
